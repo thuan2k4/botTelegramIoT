@@ -7,7 +7,7 @@ import json
 import socket
 
 # Khởi tạo Bot và Dispatcher
-API_Key = ''
+API_Key = '7106176859:AAHKvfQt-2DcMNf8HxY3_QdzuOHh1nEilNM'
 bot = Bot(token=API_Key)
 dp = Dispatcher()
 
@@ -81,7 +81,6 @@ async def handle_inline_button(callback : types.CallbackQuery):
     
 @router.callback_query(F.data == 'toggle')
 async def toggle_led(callback: types.CallbackQuery):
-    
 
     btn_led_main = InlineKeyboardButton(text = 'Led0', callback_data='led_main')
     btn_led_d7 = InlineKeyboardButton(text = 'Led1', callback_data='led_d7')
@@ -115,13 +114,49 @@ async def led_main(callback: types.CallbackQuery):
         ]
     )
     
+    url = url_host + '/api/change_status_led'
+    response = requests.get(url=url)
+    data = response.json().get('Led_Main')
+    response.close()
+
+    status = "On" if data == 0 else 'Off'
+        
     try:
-        await bot.send_message(callback.from_user.id, "Bật tắt Led", reply_markup=keyboard)
+        await bot.send_message(callback.from_user.id, f"Bật tắt Led0\n Trạng thái: {status}", reply_markup=keyboard)
         await callback.message.delete()
     except Exception as e:
         print(f"Error: {e}")
         
     await callback.answer()
+    
+@router.callback_query(F.data.in_(['turn_on_main', 'turn_off_main']))
+async def handle_led0(callback : types.CallbackQuery):
+    
+    url = url_host + '/api/change_status_led/Led_Main/'
+    
+    if callback.data == 'turn_on_main':
+        
+        url += 'On'
+    
+    else:
+        
+        url += 'Off'
+    
+    try:
+        response = requests.put(url=url)
+        print(response.text)
+    
+    except requests.RequestException as e:
+        print(f"Request failed: {e}")
+        
+    finally:
+        response.close()
+    
+
+    
+    await led_main(callback)
+    await callback.answer()
+
 
 @router.callback_query(F.data == 'led_d7')
 async def led_d7(callback: types.CallbackQuery):
@@ -133,14 +168,44 @@ async def led_d7(callback: types.CallbackQuery):
         ]
     )
     
+    url = url_host + '/api/change_status_led'
+    response = requests.get(url=url)
+    data = response.json().get('Led_D7')
+    response.close()
+
+    status = "On" if data == 1023 else 'Off'
     try:
-        await bot.send_message(callback.from_user.id, "Bật tắt Led", reply_markup=keyboard)
+        await bot.send_message(callback.from_user.id, f"Bật tắt Led1\n Trạng thái: {status}", reply_markup=keyboard)
         await callback.message.delete()
     except Exception as e:
         print(f"Error: {e}")
         
     await callback.answer()
+
+@router.callback_query(F.data.in_(['turn_on_d7', 'turn_off_d7']))
+async def handle_led1(callback : types.CallbackQuery):
     
+    url = url_host + '/api/change_status_led/Led_D7/'
+    
+    if callback.data == 'turn_on_d7':
+        url += 'On'
+
+    else:
+        url += 'Off'
+
+    
+    try:
+        response = requests.put(url=url)
+        print(response.text)
+        
+    except requests.RequestException as e:
+        print(f"Request failed: {e}")
+        
+    finally:
+        response.close()
+    
+    await led_d7(callback)
+    await callback.answer()
 
 @router.callback_query(F.data == 'led_d8')
 async def led_d8(callback: types.CallbackQuery):
@@ -151,15 +216,45 @@ async def led_d8(callback: types.CallbackQuery):
             [InlineKeyboardButton(text="Back", callback_data="Home")]
         ]
     )
+    url = url_host + '/api/change_status_led'
+    response = requests.get(url=url)
+    data = response.json().get('Led_D8')
+    response.close()
+
+    status = "On" if data == 1023 else 'Off'
     
     try:
-        await bot.send_message(callback.from_user.id, "Bật tắt Led", reply_markup=keyboard)
+        await bot.send_message(callback.from_user.id, f"Bật tắt Led2\n Trạng thái: {status}", reply_markup=keyboard)
         await callback.message.delete()
     except Exception as e:
         print(f"Error: {e}")
         
     await callback.answer()
 
+@router.callback_query(F.data.in_(['turn_on_d8', 'turn_off_d8']))
+async def handle_led2(callback : types.CallbackQuery):
+    
+    url = url_host + '/api/change_status_led/Led_D8/'
+    
+    if callback.data == 'turn_on_d8':
+        url += 'On'
+    else:
+        url += 'Off'
+    
+    try:
+        response = requests.put(url=url)
+        print(response.text)
+    
+    except requests.RequestException as e:
+        print(f"Request failed: {e}")
+        
+    finally:
+        
+        response.close()
+    
+    await led_d8(callback)
+    await callback.answer()
+    
 
 if __name__ == "__main__":
 
