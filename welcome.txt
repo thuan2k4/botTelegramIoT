@@ -1,0 +1,3 @@
+Đây là mini app của Smart Home
+
+Vui lòng chọn các section dưới đây để tiến hành điều khiển board
